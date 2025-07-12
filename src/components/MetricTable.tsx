@@ -1,7 +1,9 @@
 import { Table } from "antd";
+import type { WeatherCondition } from "../api/models";
+import { celciusToFahrenheit } from "../utils/conversions";
 
 interface MetricTableProps {
-  data: [];
+  data: WeatherCondition[];
   unit: string;
   isLoading: boolean;
 }
@@ -13,12 +15,9 @@ function MetricTable({ data, unit, isLoading }: MetricTableProps) {
       columns={columns(unit)}
       style={{ width: "50%" }}
       loading={isLoading}
+      rowKey={(record) => record.id}
     />
   );
-}
-
-function celciusToFahrenheit(celsius: number): number {
-  return (celsius * 9) / 5 + 32;
 }
 
 const columns = (unit: string) => {
