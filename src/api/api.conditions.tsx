@@ -19,7 +19,7 @@ export function useFetch<T>(url: string): FetchState<T> {
   useEffect(() => {
     let isMounted = true;
 
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState({ data: [], isLoading: true, error: null });
 
     fetch(url)
       .then((res) => {
