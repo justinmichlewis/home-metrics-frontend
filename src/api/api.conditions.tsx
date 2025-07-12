@@ -9,7 +9,7 @@ type FetchState<T> = {
 
 const baseUrl = "http://10.0.0.168:5000/api";
 
-export function useFetch<T>(url: string) {
+export function useFetch<T>(url: string): FetchState<T> {
   const [state, setState] = useState<FetchState<T>>({
     data: [],
     isLoading: true,
