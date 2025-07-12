@@ -4,25 +4,25 @@ import { useEffect, useState } from "react";
 interface ChartProps {
   data: any[];
   unit: string;
-  yAxisDataKey: string;
+  yAxisDataKeyOne: string;
+  yAxisDataKeyTwo: string;
   xAxisDataKey: string;
 }
 
-function Chart({ data, unit, yAxisDataKey, xAxisDataKey }: ChartProps) {
-  const reversedData = data ? [...data].reverse() : [];
+function DualLineChart({
+  data,
+  unit,
+  yAxisDataKeyOne,
+  yAxisDataKeyTwo,
+  xAxisDataKey,
+}: ChartProps) {
   const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
-    if (reversedData && reversedData.length > 0) {
-      setChartData(reversedData);
-    } else {
-      setChartData([]);
-    }
-
     if (unit === "F") {
-      setChartData(celciusToFahrenheit(reversedData));
+      setChartData(celciusToFahrenheit(data));
     } else {
-      setChartData(reversedData);
+      setChartData(data);
     }
   }, [data, unit]);
 
@@ -41,14 +41,10 @@ function Chart({ data, unit, yAxisDataKey, xAxisDataKey }: ChartProps) {
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis
         dataKey={xAxisDataKey}
-        tickFormatter={(isoStr) =>
-          new Date(isoStr).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        }
+        tickFormatter={(isoStr) => new Date(isoStr).toUTCString()}
+        interval={2}
+        angle={-45}
+        textAnchor="end"
       />
       <YAxis
         domain={[
@@ -59,8 +55,15 @@ function Chart({ data, unit, yAxisDataKey, xAxisDataKey }: ChartProps) {
       <Legend />
       <Line
         type="monotone"
-        dataKey={yAxisDataKey}
+        dataKey={yAxisDataKeyOne}
         stroke="#8884d8"
+        dot={false}
+        activeDot={false}
+      />
+      <Line
+        type="monotone"
+        dataKey={yAxisDataKeyTwo}
+        stroke="red"
         dot={false}
         activeDot={false}
       />
@@ -71,8 +74,10 @@ function Chart({ data, unit, yAxisDataKey, xAxisDataKey }: ChartProps) {
 const getMixMaxTempRange = (data: any[]) => {
   if (!data || data.length === 0) return [40, 100];
   const temperatures = data.map((d) => d.temperature);
-  const minTemp = Math.floor(Math.min(...temperatures) * 10) / 10;
-  const maxTemp = Math.ceil(Math.max(...temperatures) * 10) / 10;
+  const minTemp = Math.floor(Math.min(...temperatures) * 10) / 10 - 10;
+  const maxTemp = Math.ceil(Math.max(...temperatures) * 10) / 10 + 30;
+
+  console.log("Min Temp:", minTemp, "Max Temp:", maxTemp);
   return [minTemp, maxTemp];
 };
 
@@ -85,7 +90,11 @@ const celciusToFahrenheit = (data: any) => {
       typeof item.temperature === "number"
         ? toFahrenheit(item.temperature)
         : item.temperature,
+    historicalTemperature:
+      typeof item.historicalTemperature === "number"
+        ? toFahrenheit(item.historicalTemperature)
+        : item.historicalTemperature,
   }));
 };
 
-export default Chart;
+export default DualLineChart;
