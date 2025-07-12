@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { getEndOfDayTime, getStartOrEndOfDayInTimezone } from "../utils/date";
 import { DateStartEnd } from "../api/models";
+import { ApiError } from "./Error";
 
 const { RangePicker } = DatePicker;
 dayjs.extend(utc);
@@ -99,14 +100,21 @@ function Details() {
         />
       </Flex>
       <Flex gap="middle" align="start" justify="space-between">
-        <MetricTable data={data} unit={unit} isLoading={isLoading} />
-        {/* <DualLineChart
-          data={[...data].reverse()}
-          unit={unit}
-          yAxisDataKeyOne="temperature"
-          yAxisDataKeyTwo="historicalTemperature"
-          xAxisDataKey="reading_created_at_nearest_hour"
-        /> */}
+        {error ? (
+          <ApiError error={error} />
+        ) : (
+          <>
+            <MetricTable data={data} unit={unit} isLoading={isLoading} />
+            <DualLineChart
+              data={[...data].reverse()}
+              unit={unit}
+              yAxisDataKeyOne="temperature"
+              yAxisDataKeyTwo="historicalTemperature"
+              xAxisDataKey="reading_created_at_nearest_hour"
+            />
+          </>
+        )}
+
         {/* <Chart
           data={data}
           unit={unit}
