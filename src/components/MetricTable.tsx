@@ -3,16 +3,32 @@ import { Table } from "antd";
 interface MetricTableProps {
   data: [];
   unit: string;
+  isLoading: boolean;
 }
 
-function MetricTable({ data, unit }: MetricTableProps) {
-  const columns = [
+function MetricTable({ data, unit, isLoading }: MetricTableProps) {
+  return (
+    <Table
+      dataSource={data}
+      columns={columns(unit)}
+      style={{ width: "50%" }}
+      loading={isLoading}
+    />
+  );
+}
+
+function celciusToFahrenheit(celsius: number): number {
+  return (celsius * 9) / 5 + 32;
+}
+
+const columns = (unit: string) => {
+  return [
     {
       title: "Date",
-      dataIndex: "reading_created_at",
-      key: "reading_created_at",
+      dataIndex: "readingCreatedAtNearestHour",
+      key: "readingCreatedAtNearestHour",
       width: 250,
-      render: (text: string) => new Date(text).toLocaleString(),
+      render: (date: string) => new Date(date).toLocaleString("en-US"),
     },
     {
       title: (
@@ -30,18 +46,27 @@ function MetricTable({ data, unit }: MetricTableProps) {
           : `${temp.toFixed(2)} °C`,
     },
     {
+      title: (
+        <>
+          Historical Temperature{String.fromCharCode(176)}
+          {unit}
+        </>
+      ),
+      dataIndex: "historicalTemperature",
+      key: "historicalTemperature",
+      width: 250,
+      render: (temp: number) =>
+        unit === "F"
+          ? `${celciusToFahrenheit(temp).toFixed(2)} °F`
+          : `${temp.toFixed(2)} °C`,
+    },
+    {
       title: "Humidity",
       dataIndex: "humidity",
       key: "humidity",
       render: (humidity: number) => `${humidity.toFixed(2)} %`,
     },
   ];
-
-  return <Table dataSource={data} columns={columns} style={{ width: "50%" }} />;
-}
-
-function celciusToFahrenheit(celsius: number): number {
-  return (celsius * 9) / 5 + 32;
-}
+};
 
 export default MetricTable;
