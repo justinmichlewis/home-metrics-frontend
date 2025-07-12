@@ -16,3 +16,13 @@ export const DateStartEnd = {
 export type DateStartEndType = (typeof DateStartEnd)[keyof typeof DateStartEnd];
 
 export type TimeZone = (typeof timeZonesNames)[number];
+
+export interface WeatherCondition {
+  id: string;
+  readingCreatedAt: string;
+  readingCreatedAtNearestHour: string;
+  temperature: number;
+  humidity: number;
+  historicalTemperature: number;
+  historicalHumidity: number;
+}
