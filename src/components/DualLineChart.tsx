@@ -32,6 +32,7 @@ function DualLineChart<T>({
   isLoading,
 }: ChartProps<T>) {
   const [chartData, setChartData] = useState<any[]>([]);
+  const [chartHeight, setChartHeight] = useState<number>(650);
 
   useEffect(() => {
     if (unit === TemperatureScale.Fahrenheit) {
@@ -41,9 +42,24 @@ function DualLineChart<T>({
     }
   }, [data, unit]);
 
+  // TODO MOVE THIS INTO UTILS
+  const FOOTER_HEIGHT = 300;
+
+  const calculateTableHeight = () => {
+    const padding = FOOTER_HEIGHT;
+    const availableHeight = window.innerHeight - padding;
+    setChartHeight(availableHeight);
+  };
+
+  useEffect(() => {
+    calculateTableHeight();
+    window.addEventListener("resize", calculateTableHeight);
+    return () => window.removeEventListener("resize", calculateTableHeight);
+  }, []);
+
   return (
     <>
-      <ResponsiveContainer width="50%" height={650}>
+      <ResponsiveContainer width="50%" height={chartHeight}>
         <Spin
           spinning={isLoading}
           style={{
@@ -53,7 +69,7 @@ function DualLineChart<T>({
           }}
         />
         <LineChart
-          data={data}
+          data={chartData}
           margin={{
             top: 5,
             right: 30,

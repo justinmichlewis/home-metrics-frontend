@@ -1,6 +1,7 @@
 import { Table } from "antd";
 import type { WeatherCondition } from "../api/models";
 import { celciusToFahrenheit } from "../utils/conversions";
+import { useEffect, useState } from "react";
 
 interface MetricTableProps {
   data: WeatherCondition[];
@@ -8,14 +9,31 @@ interface MetricTableProps {
   isLoading: boolean;
 }
 
+const FOOTER_HEIGHT = 400;
+
 function MetricTable({ data, unit, isLoading }: MetricTableProps) {
+  const [scrollY, setScrollY] = useState<number>(0);
+
+  const calculateTableHeight = () => {
+    const padding = FOOTER_HEIGHT;
+    const availableHeight = window.innerHeight - padding;
+    setScrollY(availableHeight);
+  };
+
+  useEffect(() => {
+    calculateTableHeight();
+    window.addEventListener("resize", calculateTableHeight);
+    return () => window.removeEventListener("resize", calculateTableHeight);
+  }, []);
+
   return (
     <Table
       dataSource={data}
       columns={columns(unit)}
-      style={{ width: "50%" }}
+      scroll={{ y: scrollY }}
       loading={isLoading}
       rowKey={(record) => record.id}
+      style={{ width: "50%" }}
     />
   );
 }
@@ -26,7 +44,6 @@ const columns = (unit: string) => {
       title: "Date",
       dataIndex: "readingCreatedAtNearestHour",
       key: "readingCreatedAtNearestHour",
-      width: 250,
       render: (date: string) => new Date(date).toLocaleString("en-US"),
     },
     {
@@ -38,7 +55,6 @@ const columns = (unit: string) => {
       ),
       dataIndex: "temperature",
       key: "temperature",
-      width: 250,
       render: (temp: number) =>
         unit === "F"
           ? `${celciusToFahrenheit(temp).toFixed(2)} °F`
@@ -53,7 +69,6 @@ const columns = (unit: string) => {
       ),
       dataIndex: "historicalTemperature",
       key: "historicalTemperature",
-      width: 250,
       render: (temp: number) =>
         unit === "F"
           ? `${celciusToFahrenheit(temp).toFixed(2)} °F`

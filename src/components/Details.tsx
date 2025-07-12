@@ -4,7 +4,7 @@ import DualLineChart from "./DualLineChart";
 import { useGetAllConditions } from "../api/api.conditions";
 import type { TemperatureScaleType } from "../api/models";
 import { TemperatureScale } from "../api/models";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { RangePickerProps } from "antd/es/date-picker";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -91,6 +91,9 @@ function Details() {
         />
       </Flex>
       <Flex gap="middle" align="start" justify="space-between">
+        {/* <MetricTable data={data} unit={unit} isLoading={isLoading} />
+        <div style={{ width: "100%", background: "blue" }}>Area1</div>
+        <div style={{ width: "500px", background: "red" }}>Area2</div> */}
         {error ? (
           <ApiError error={error} />
         ) : (
