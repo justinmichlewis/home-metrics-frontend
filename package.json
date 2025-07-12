@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/luxon": "^3.6.2",
+    "@vvo/tzdb": "^6.177.0",
     "antd": "^5.26.2",
+    "luxon": "^3.6.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^3.0.2"
