@@ -4,7 +4,7 @@ import DualLineChart from "./DualLineChart";
 import { useGetAllConditions } from "../api/api.conditions";
 import type { TemperatureScaleType } from "../api/models";
 import { TemperatureScale } from "../api/models";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { RangePickerProps } from "antd/es/date-picker";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -51,15 +51,6 @@ function Details() {
   const onDateChange: RangePickerProps["onChange"] = (dates) => {
     if (dates) {
       const [start, end] = dates;
-
-      console.log(
-        "Selected dates:",
-        getStartOrEndOfDayInTimezone(
-          start?.toISOString() || "",
-          DateStartEnd.Start
-        ),
-        getStartOrEndOfDayInTimezone(end?.toISOString() || "", DateStartEnd.End)
-      );
 
       // Antd DatePicker will return dates in local timezone, so we need to convert them to UTC
       // and set the end date to the end of the day localized to the timezone
@@ -110,23 +101,11 @@ function Details() {
               unit={unit}
               yAxisDataKeyOne="temperature"
               yAxisDataKeyTwo="historicalTemperature"
-              xAxisDataKey="reading_created_at_nearest_hour"
+              xAxisDataKey="readingCreatedAtNearestHour"
+              isLoading={isLoading}
             />
           </>
         )}
-
-        {/* <Chart
-          data={data}
-          unit={unit}
-          yAxisDataKey="temperature"
-          xAxisDataKey="reading_created_at"
-        />
-        <Chart
-          data={historicalData.data.data}
-          unit={unit}
-          yAxisDataKey="v"
-          xAxisDataKey="t"
-        /> */}
       </Flex>
     </div>
   );

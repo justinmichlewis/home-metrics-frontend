@@ -1,25 +1,40 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { useEffect, useState } from "react";
+import type { TemperatureScaleType } from "../api/models";
+import { TemperatureScale } from "../api/models";
+import { getMixMaxTempRange } from "../utils/chart";
+import { Spin } from "antd";
 
-interface ChartProps {
-  data: any[];
-  unit: string;
+interface ChartProps<T> {
+  data: T[];
+  unit: TemperatureScaleType;
   yAxisDataKeyOne: string;
   yAxisDataKeyTwo: string;
   xAxisDataKey: string;
+  isLoading: boolean;
 }
 
-function DualLineChart({
+function DualLineChart<T>({
   data,
   unit,
   yAxisDataKeyOne,
   yAxisDataKeyTwo,
   xAxisDataKey,
-}: ChartProps) {
+  isLoading,
+}: ChartProps<T>) {
   const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
-    if (unit === "F") {
+    if (unit === TemperatureScale.Fahrenheit) {
       setChartData(celciusToFahrenheit(data));
     } else {
       setChartData(data);
@@ -27,60 +42,68 @@ function DualLineChart({
   }, [data, unit]);
 
   return (
-    <LineChart
-      width={800}
-      height={650}
-      data={chartData}
-      margin={{
-        top: 5,
-        right: 30,
-        left: 20,
-        bottom: 5,
-      }}
-    >
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis
-        dataKey={xAxisDataKey}
-        tickFormatter={(isoStr) => new Date(isoStr).toUTCString()}
-        interval={2}
-        angle={-45}
-        textAnchor="end"
-      />
-      <YAxis
-        domain={[
-          getMixMaxTempRange(chartData)[0],
-          getMixMaxTempRange(chartData)[1],
-        ]}
-      />
-      <Legend />
-      <Line
-        type="monotone"
-        dataKey={yAxisDataKeyOne}
-        stroke="#8884d8"
-        dot={false}
-        activeDot={false}
-      />
-      <Line
-        type="monotone"
-        dataKey={yAxisDataKeyTwo}
-        stroke="red"
-        dot={false}
-        activeDot={false}
-      />
-    </LineChart>
+    <>
+      <ResponsiveContainer width="50%" height={650}>
+        <Spin
+          spinning={isLoading}
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+          }}
+        />
+        <LineChart
+          data={data}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey={xAxisDataKey}
+            tickFormatter={(isoStr) => new Date(isoStr).toLocaleString()}
+            interval={2}
+            angle={-45}
+            textAnchor="end"
+          />
+          <YAxis
+            domain={[
+              getMixMaxTempRange(chartData)[0],
+              getMixMaxTempRange(chartData)[1],
+            ]}
+          />
+          <Tooltip
+            labelFormatter={(label: string | number) => {
+              const date = new Date(label);
+              return <strong>{date.toLocaleString()}</strong>;
+            }}
+            formatter={(value: number, name: string) => {
+              return [`${value.toFixed(2)}`, name];
+            }}
+          />
+          <Legend />
+          <Line
+            type="monotone"
+            dataKey={yAxisDataKeyOne}
+            stroke="#8884d8"
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            dataKey={yAxisDataKeyTwo}
+            stroke="red"
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </>
   );
 }
 
-const getMixMaxTempRange = (data: any[]) => {
-  if (!data || data.length === 0) return [40, 100];
-  const temperatures = data.map((d) => d.temperature);
-  const minTemp = Math.floor(Math.min(...temperatures) * 10) / 10 - 10;
-  const maxTemp = Math.ceil(Math.max(...temperatures) * 10) / 10 + 30;
-
-  console.log("Min Temp:", minTemp, "Max Temp:", maxTemp);
-  return [minTemp, maxTemp];
-};
-
+//TODO Use util function to convert Celsius to Fahrenheit
 const celciusToFahrenheit = (data: any) => {
   const toFahrenheit = (celsius: number) => (celsius * 9) / 5 + 32;
 
