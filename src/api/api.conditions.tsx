@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import type { WeatherCondition } from "./models";
 
 type FetchState<T> = {
-  data: T | [];
+  data: T[];
   isLoading: boolean;
   error: string | null;
 };
 
-export function useFetch<T = any>(url: string) {
+const baseUrl = "http://10.0.0.168:5000/api";
+
+export function useFetch<T>(url: string) {
   const [state, setState] = useState<FetchState<T>>({
     data: [],
     isLoading: true,
@@ -42,9 +45,17 @@ export function useFetch<T = any>(url: string) {
   return state;
 }
 
-export function useGetConditions() {
-  const { data, error, isLoading } = useFetch(
-    "http://127.0.0.1:5000/api/bme680_readings"
+export function useGetAllConditions(
+  startDate: string,
+  endDate: string
+): FetchState<WeatherCondition> {
+  const params = new URLSearchParams({
+    startDate,
+    endDate,
+  });
+
+  const { data, error, isLoading } = useFetch<WeatherCondition>(
+    `${baseUrl}/all_readings?${params.toString()}`
   );
 
   return {
