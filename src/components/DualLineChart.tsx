@@ -74,14 +74,21 @@ function DualLineChart<T>({
             top: 5,
             right: 30,
             left: 20,
-            bottom: 5,
+            bottom: 70,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey={xAxisDataKey}
-            tickFormatter={(isoStr) => new Date(isoStr).toLocaleString()}
-            interval={2}
+            tickFormatter={(isoStr) =>
+              new Date(isoStr).toLocaleString("en-US", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            }
+            interval="preserveStartEnd"
             angle={-45}
             textAnchor="end"
           />
@@ -100,7 +107,7 @@ function DualLineChart<T>({
               return [`${value.toFixed(2)}`, name];
             }}
           />
-          <Legend />
+          {/* <Legend /> */}
           <Line
             type="monotone"
             dataKey={yAxisDataKeyOne}
