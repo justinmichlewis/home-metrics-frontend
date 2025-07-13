@@ -7,7 +7,7 @@ type FetchState<T> = {
   error: string | null;
 };
 
-const baseUrl = "http://10.0.0.168:5000/api";
+const baseUrl = "http://24.20.58.220/api"; //"http://10.0.0.168:5000/api";
 
 export function useFetch<T>(url: string): FetchState<T> {
   const [state, setState] = useState<FetchState<T>>({
